@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>은퇴 자산 관리 시뮬레이터</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #2589F4 0%, #1e40af 100%);
+            color: white;
+            padding: 1.5rem 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(37, 137, 244, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            header {
+                margin-bottom: 2rem;
+                padding: 2rem;
+            }
+        }
+
+        header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        @media (min-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 768px) {
+            header p {
+                font-size: 1.125rem;
+            }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 350px 1fr;
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .sticky {
+            position: static;
+        }
+
+        @media (min-width: 1200px) {
+            .sticky {
+                position: sticky;
+                top: 2rem;
+            }
+        }
+
+        .form-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2589F4;
+            border-bottom: 2px solid #E5F4FF;
+            padding-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-section h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.75rem;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            color: #1e293b;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        @media (min-width: 768px) {
+            .form-input {
+                padding: 0.75rem;
+            }
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2589F4;
+            box-shadow: 0 0 0 3px rgba(37, 137, 244, 0.1);
+        }
+
+        .input-unit {
+            display: block;
+            font-size: 0.75rem;
+            color: #2589F4;
+            font-weight: 600;
+            margin-top: 0.25rem;
+            min-height: 1rem;
+        }
+
+        .form-range {
+            width: 100%;
+            height: 0.75rem;
+            border-radius: 0.5rem;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        @media (min-width: 768px) {
+            .form-range {
+                height: 0.5rem;
+            }
+        }
+
+        .form-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #2589F4;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(37, 137, 244, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .form-range::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .form-range::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #2589F4;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(37, 137, 244, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .form-range::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .range-value {
+            font-weight: 600;
+            color: #2589F4;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .results-section {
+                gap: 2rem;
+            }
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 600px) {
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #E5F4FF 0%, #f0f9ff 100%);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            border: 1px solid rgba(37, 137, 244, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .summary-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .summary-card h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .summary-card h3 {
+                font-size: 1rem;
+            }
+        }
+
+        .summary-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2589F4;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        @media (min-width: 768px) {
+            .summary-value {
+                font-size: 2.25rem;
+            }
+        }
+
+        .comparison-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .comparison-text {
+                font-size: 0.875rem;
+            }
+        }
+
+        .safe {
+            color: #059669;
+        }
+
+        .warning {
+            color: #dc2626;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #2589F4;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .section-description {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        @media (min-width: 768px) {
+            .section-description {
+                font-size: 0.875rem;
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
+            }
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+                padding: 1rem;
+            }
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+        }
+
+        .table-container {
+            max-height: 300px;
+            overflow-x: auto;
+            overflow-y: auto;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (min-width: 768px) {
+            .table-container {
+                max-height: 400px;
+            }
+        }
+
+        .data-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .data-table {
+                font-size: 0.875rem;
+                min-width: auto;
+            }
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #E5F4FF 0%, #f0f9ff 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+            .data-table th,
+            .data-table td {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .data-table th {
+            font-weight: 600;
+            color: #2589F4;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (min-width: 768px) {
+            .data-table th {
+                font-size: 0.75rem;
+            }
+        }
+
+        .data-table tbody tr {
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .data-table td:last-child {
+            font-weight: 500;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 200px;
+        }
+
+        @media (min-width: 768px) {
+            .tooltip {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+                max-width: none;
+            }
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tab-container {
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .tab-container {
+                margin-bottom: 2rem;
+            }
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            background-color: #f1f5f9;
+            border-radius: 0.75rem;
+            padding: 0.25rem;
+            margin-bottom: 1rem;
+            gap: 0.25rem;
+        }
+
+        @media (min-width: 768px) {
+            .tab-buttons {
+                flex-direction: row;
+                margin-bottom: 1.5rem;
+                gap: 0;
+            }
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .tab-button {
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+                min-height: auto;
+            }
+        }
+
+        .tab-button.active {
+            background-color: #2589F4;
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 137, 244, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .goal-calculator {
+            background: linear-gradient(135deg, #E5F4FF 0%, #f0f9ff 100%);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(37, 137, 244, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .goal-calculator {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .goal-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 600px) {
+            .goal-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .goal-grid {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .info-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .info-card {
+            background: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        @media (min-width: 768px) {
+            .info-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .info-card h3 {
+            color: #2589F4;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .info-card h3 {
+                font-size: 1.125rem;
+            }
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            gap: 1rem;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .info-label {
+                font-size: 0.875rem;
+            }
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        @media (min-width: 768px) {
+            .info-value {
+                font-size: 1rem;
+            }
+        }
+
+        .tips-section {
+            background: linear-gradient(135deg, #2589F4 0%, #1e40af 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .tips-section {
+                padding: 2rem;
+                margin-top: 2rem;
+            }
+        }
+
+        .tips-section h2 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            .tips-section h2 {
+                margin-bottom: 1.5rem;
+                font-size: 1.5rem;
+            }
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .tips-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+
+        .tip-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .tip-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .tip-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #E5F4FF;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .tip-card h3 {
+                font-size: 1.125rem;
+            }
+        }
+
+        .tip-card p {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        @media (min-width: 768px) {
+            .tip-card p {
+                font-size: 0.875rem;
+                line-height: 1.6;
+            }
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #2589F4 0%, #1e40af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        .calculate-btn {
+            background: #2589F4;
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(37, 137, 244, 0.3);
+            font-size: 1rem;
+            width: 100%;
+            min-height: 48px;
+        }
+
+        @media (min-width: 768px) {
+            .calculate-btn {
+                width: auto;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+
+        .calculate-btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(37, 137, 244, 0.4);
+        }
+
+        .result-highlight {
+            background: linear-gradient(135deg, #E5F4FF 0%, #f0f9ff 100%);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(37, 137, 244, 0.2);
+            text-align: center;
+        }
+
+        .result-highlight .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2589F4;
+            line-height: 1.2;
+        }
+
+        @media (min-width: 768px) {
+            .result-highlight .value {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* 모바일 터치 최적화 */
+        @media (max-width: 767px) {
+            * {
+                -webkit-tap-highlight-color: rgba(37, 137, 244, 0.2);
+            }
+
+            button, input[type="range"] {
+                touch-action: manipulation;
+            }
+
+            .form-input:focus {
+                transform: none;
+                zoom: 1;
+            }
+
+            /* iOS 사파리 줌 방지 */
+            input[type="text"],
+            input[type="number"] {
+                font-size: 16px;
+            }
+        }
+
+        /* 스크롤바 스타일링 */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 반응형 개선: 주요 섹션 모바일 최적화 */
+        @media (max-width: 767px) {
+            .main-grid {
+                flex-direction: column !important;
+                display: flex !important;
+                gap: 1rem !important;
+            }
+            .card, .form-section, .results-section, .table-container, .chart-container {
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+            }
+            .summary-grid {
+                flex-direction: column !important;
+                display: flex !important;
+                gap: 1rem !important;
+            }
+            .data-table {
+                min-width: 360px !important;
+                font-size: 0.75rem !important;
+            }
+            .chart-container {
+                height: 220px !important;
+                padding: 0.25rem !important;
+            }
+            .form-input, .form-range {
+                font-size: 16px !important;
+            }
+            .form-label {
+                font-size: 0.85rem !important;
+            }
+            .section-title, .form-section h2 {
+                font-size: 1.1rem !important;
+                word-break: keep-all !important;
+            }
+            .section-description {
+                font-size: 0.8rem !important;
+                word-break: keep-all !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>은퇴 자산 시뮬레이터</h1>
+            <p>숫자로 보는 스마트한 은퇴 설계</p>
+        </header>
+
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('retirement')">은퇴 계획 분석</button>
+                <button class="tab-button" onclick="switchTab('goal')">목표 달성 계산</button>
+                <button class="tab-button" onclick="switchTab('reference')">참고 정보</button>
+            </div>
+
+            <!-- 은퇴 계획 분석 탭 -->
+            <div id="retirement-tab" class="tab-content active">
+                <div class="main-grid">
+                    <!-- Input Panel -->
+                    <aside>
+                        <div class="card sticky">
+                            <div class="form-section">
+                                <h2>📊 입력 정보</h2>
+                                <form id="retirementForm">
+                                    <div class="form-group">
+                                        <label for="pv" class="form-label">현재 자산 총액 (원)</label>
+                                        <input type="text" id="pv" value="2,100,000,000" class="form-input" inputmode="numeric">
+                                        <span id="pv_unit" class="input-unit"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="monthly_spending" class="form-label">월 평균 소비액 (원)</label>
+                                        <input type="text" id="monthly_spending" value="5,000,000" class="form-input" inputmode="numeric">
+                                        <span id="monthly_spending_unit" class="input-unit"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="return_rate" class="form-label">연평균 투자 수익률 (%) <span id="return_rate_value" class="range-value">7.0%</span></label>
+                                        <input type="range" id="return_rate" min="0" max="20" value="7" step="0.1" class="form-range">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inflation_rate" class="form-label">연평균 물가 상승률 (%) <span id="inflation_rate_value" class="range-value">5.0%</span></label>
+                                        <input type="range" id="inflation_rate" min="0" max="10" value="5" step="0.1" class="form-range">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="age" class="form-label">현재 나이</label>
+                                        <input type="number" id="age" value="60" class="form-input" inputmode="numeric">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="life_expectancy" class="form-label">기대 수명</label>
+                                        <input type="number" id="life_expectancy" value="90" class="form-input" inputmode="numeric">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Results Display -->
+                    <main class="results-section">
+                        <section class="card">
+                            <h2 class="section-title">📈 핵심 요약</h2>
+                            <p class="section-description">입력하신 정보를 바탕으로 분석한 은퇴 재무 핵심 지표입니다. 자산이 언제 소진되는지, 그리고 은퇴 기간 동안 필요한 최소 자금은 얼마인지 확인해 보세요.</p>
+                            <div class="summary-grid">
+                                <div class="summary-card">
+                                    <h3>예상 자산 소모 기간</h3>
+                                    <p id="depletion_period" class="summary-value">39.6년</p>
+                                </div>
+                                <div class="summary-card">
+                                    <h3>최소 필요 자금</h3>
+                                    <p id="min_required_funds" class="summary-value">13.20억원</p>
+                                    <p id="funds_comparison" class="comparison-text safe">현재 자산이 7.80억원 더 많아 안정적입니다.</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="card">
+                            <h2 class="section-title">📊 연도별 자산 시뮬레이션</h2>
+                            <p class="section-description">시간의 흐름에 따라 자산이 어떻게 변화하는지 시각적으로 확인하세요. 투자 수익으로 자산이 증가하다가, 인상된 소비액으로 인해 점차 감소하는 추세를 파악할 수 있습니다.</p>
+                            <div class="chart-container">
+                                <canvas id="assetChart" class="chart-canvas"></canvas>
+                            </div>
+                            <div class="tooltip" id="chartTooltip"></div>
+                        </section>
+
+                        <section class="card">
+                            <h2 class="section-title">📋 상세 데이터 표</h2>
+                            <p class="section-description">각 연도의 시작 자산, 수익, 소비, 그리고 연말 자산에 대한 상세 데이터를 표로 제공합니다. 차트에서 확인한 추세의 구체적인 수치를 확인할 수 있습니다.</p>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>연차</th>
+                                            <th>시작 자산</th>
+                                            <th>연간 수익</th>
+                                            <th>연간 소비</th>
+                                            <th>연말 자산</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="simulation_table_body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            </div>
+
+            <!-- 목표 달성 계산 탭 -->
+            <div id="goal-tab" class="tab-content">
+                <div class="card">
+                    <h2 class="section-title">🎯 목표 달성 계산기</h2>
+                    <p class="section-description">목표 금액을 모으는데 필요한 기간이나 월 적립금을 계산해보세요.</p>
+
+                    <div class="goal-calculator">
+                        <div class="goal-grid">
+                            <div class="form-group">
+                                <label for="goal_amount" class="form-label">목표 금액 (원)</label>
+                                <input type="text" id="goal_amount" class="form-input" placeholder="목표 금액 입력" inputmode="numeric">
+                                <span id="goal_amount_unit" class="input-unit"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="goal_period" class="form-label">목표 기간 (년)</label>
+                                <input type="number" id="goal_period" class="form-input" placeholder="목표 기간 입력" inputmode="numeric">
+                            </div>
+                            <div class="form-group">
+                                <label for="goal_return_rate" class="form-label">투자 수익률 (%)</label>
+                                <input type="number" id="goal_return_rate" step="0.1" class="form-input" placeholder="투자 수익률 입력" inputmode="decimal">
+                            </div>
+                            <div class="form-group">
+                                <label for="goal_inflation_rate" class="form-label">인플레이션 (%)</label>
+                                <input type="number" id="goal_inflation_rate" step="0.1" class="form-input" placeholder="인플레이션 입력" inputmode="decimal">
+                            </div>
+                        </div>
+
+                        <button type="button" class="calculate-btn" onclick="calculateGoal()">계산하기</button>
+
+                        <div id="goal_result" class="result-highlight" style="display: none;">
+                            <div>필요한 월 적립금: <span class="value" id="monthly_savings">-</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 참고 정보 탭 -->
+            <div id="reference-tab" class="tab-content">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>💰 대한민국 4분위 월평균 소비액</h3>
+                        <div class="info-item">
+                            <span class="info-label">1분위 (하위 25%)</span>
+                            <span class="info-value">1,200,000원</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">2분위 (25-50%)</span>
+                            <span class="info-value">2,100,000원</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">3분위 (50-75%)</span>
+                            <span class="info-value">3,200,000원</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">4분위 (상위 25%)</span>
+                            <span class="info-value">5,800,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📈 투자자산별 연간 기대수익률</h3>
+                        <div class="info-item">
+                            <span class="info-label">예금/적금</span>
+                            <span class="info-value">3.0-4.0%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">국고채 (10년)</span>
+                            <span class="info-value">3.5-4.5%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">회사채 (AA등급)</span>
+                            <span class="info-value">4.0-5.0%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">주식 (KOSPI)</span>
+                            <span class="info-value">6.0-8.0%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">부동산 (REITs)</span>
+                            <span class="info-value">5.0-7.0%</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>👥 평균 기대수명 정보</h3>
+                        <div class="info-item">
+                            <span class="info-label">남성 평균 기대수명</span>
+                            <span class="info-value">81.5세</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">여성 평균 기대수명</span>
+                            <span class="info-value">87.6세</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">전체 평균</span>
+                            <span class="info-value">84.6세</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">건강수명 (남성)</span>
+                            <span class="info-value">73.1세</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">건강수명 (여성)</span>
+                            <span class="info-value">75.5세</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🏥 의료비 관련 정보</h3>
+                        <div class="info-item">
+                            <span class="info-label">65세 이상 월평균 의료비</span>
+                            <span class="info-value">320,000원</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">장기요양보험료 (월)</span>
+                            <span class="info-value">150,000-800,000원</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">연간 의료비 증가율</span>
+                            <span class="info-value">6-8%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 꿀팁 및 가이드 섹션 -->
+        <div class="tips-section">
+            <h2>💡 은퇴 재무 설계 꿀팁</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h3>🔄 4% 법칙 활용</h3>
+                    <p>은퇴 후 연간 지출의 25배를 모으면, 매년 4%씩 인출해도 자산이 30년간 유지됩니다. 예를 들어 연간 6천만원이 필요하다면 15억원을 목표로 하세요.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h3>📊 자산 배분 전략</h3>
+                    <p>나이에 따른 주식 비중: (100 - 나이)%. 60세라면 주식 40%, 채권 60%로 배분하여 안정성과 수익성의 균형을 맞추세요.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h3>💊 의료비 대비</h3>
+                    <p>65세 이후 의료비는 연간 6-8%씩 증가합니다. 건강보험 외에도 실손보험, 장기요양보험을 미리 준비하세요.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h3>🏠 주거비 최적화</h3>
+                    <p>은퇴 후 주거비는 총 지출의 25% 이하로 유지하는 것이 좋습니다. 주택연금이나 전세 전환을 고려해보세요.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h3>📈 인플레이션 대응</h3>
+                    <p>장기 인플레이션율 3-5%를 고려하여 실질 구매력을 유지할 수 있는 자산(주식, 부동산 등)에도 투자하세요.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h3>🎯 단계별 목표 설정</h3>
+                    <p>40대: 연봉의 3배, 50대: 연봉의 6배, 60대: 연봉의 10배를 목표로 점진적으로 자산을 늘려나가세요.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const pvInput = document.getElementById('pv');
+        const monthlySpendingInput = document.getElementById('monthly_spending');
+        const returnRateInput = document.getElementById('return_rate');
+        const inflationRateInput = document.getElementById('inflation_rate');
+        const ageInput = document.getElementById('age');
+        const lifeExpectancyInput = document.getElementById('life_expectancy');
+
+        const returnRateValueSpan = document.getElementById('return_rate_value');
+        const inflationRateValueSpan = document.getElementById('inflation_rate_value');
+
+        const depletionPeriodEl = document.getElementById('depletion_period');
+        const minRequiredFundsEl = document.getElementById('min_required_funds');
+        const fundsComparisonEl = document.getElementById('funds_comparison');
+        const tableBodyEl = document.getElementById('simulation_table_body');
+
+        const chartCanvas = document.getElementById('assetChart');
+        const tooltip = document.getElementById('chartTooltip');
+
+        // Goal calculator elements
+        const goalAmountInput = document.getElementById('goal_amount');
+        const goalPeriodInput = document.getElementById('goal_period');
+        const goalReturnRateInput = document.getElementById('goal_return_rate');
+        const goalInflationRateInput = document.getElementById('goal_inflation_rate');
+
+        // Unit display elements
+        const pvUnitEl = document.getElementById('pv_unit');
+        const monthlySpendingUnitEl = document.getElementById('monthly_spending_unit');
+        const goalAmountUnitEl = document.getElementById('goal_amount_unit');
+
+        // Chart data storage
+        let chartData = [];
+        let chartDimensions = { width: 0, height: 0, padding: 40 };
+        let currentResults = { results: {}, df: [] };
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Update goal calculator defaults when switching to goal tab
+            if (tabName === 'goal') {
+                updateGoalDefaults();
+            }
+        }
+
+        // Update goal calculator default values
+        function updateGoalDefaults() {
+            const currentAsset = parseFloat(pvInput.value.replace(/,/g, '')) || 0;
+            const currentAge = parseInt(ageInput.value) || 0;
+            const returnRate = parseFloat(returnRateInput.value) || 0;
+            const inflationRate = parseFloat(inflationRateInput.value) || 0;
+
+            // Get minimum required funds from current calculation results
+            let minRequired = 0;
+            if (currentResults.results && currentResults.results.min_required_funds) {
+                minRequired = currentResults.results.min_required_funds;
+            }
+
+            // Calculate goal amount (minimum required - current asset, but at least 0)
+            const goalAmount = Math.max(0, minRequired - currentAsset);
+            const goalPeriod = Math.max(1, 55 - currentAge);
+
+            // Set values
+            goalAmountInput.value = goalAmount > 0 ? formatNumberWithCommas(goalAmount.toString()) : '';
+            goalPeriodInput.value = goalPeriod;
+            goalReturnRateInput.value = returnRate;
+            goalInflationRateInput.value = inflationRate;
+
+            // Update unit displays
+            updateInputUnit('goal_amount');
+        }
+
+        // Goal calculation
+        function calculateGoal() {
+            const goalAmount = parseFloat(goalAmountInput.value.replace(/,/g, '')) || 0;
+            const goalPeriod = parseFloat(goalPeriodInput.value) || 0;
+            const goalReturnRate = parseFloat(goalReturnRateInput.value) / 100 || 0;
+            const goalInflationRate = parseFloat(goalInflationRateInput.value) / 100 || 0;
+
+            if (goalAmount <= 0 || goalPeriod <= 0) {
+                alert('목표 금액과 목표 기간을 올바르게 입력해주세요.');
+                return;
+            }
+
+            // Calculate monthly savings needed (PMT calculation)
+            const realReturnRate = (1 + goalReturnRate) / (1 + goalInflationRate) - 1;
+            const monthlyRate = realReturnRate / 12;
+            const totalMonths = goalPeriod * 12;
+
+            let monthlyPayment;
+            if (Math.abs(monthlyRate) < 1e-10) {
+                monthlyPayment = goalAmount / totalMonths;
+            } else {
+                monthlyPayment = goalAmount * monthlyRate / (Math.pow(1 + monthlyRate, totalMonths) - 1);
+            }
+
+            document.getElementById('monthly_savings').textContent = formatCurrency(monthlyPayment);
+            document.getElementById('goal_result').style.display = 'block';
+        }
+
+        // Update input unit displays
+        function updateInputUnit(inputId) {
+            const input = document.getElementById(inputId);
+            const unitEl = document.getElementById(inputId + '_unit');
+
+            if (!input || !unitEl) return;
+
+            const value = parseFloat(input.value.replace(/,/g, '')) || 0;
+            if (value > 0) {
+                unitEl.textContent = formatCurrencyUnit(value);
+            } else {
+                unitEl.textContent = '';
+            }
+        }
+
+        // Format currency unit display
+        function formatCurrencyUnit(num) {
+            if (num >= 100000000) {
+                return `(${(num / 100000000).toFixed(1)}억원)`;
+            } else if (num >= 10000) {
+                return `(${(num / 10000).toFixed(0)}만원)`;
+            } else if (num > 0) {
+                return `(${num.toLocaleString('ko-KR')}원)`;
+            }
+            return '';
+        }
+
+        // Utility Functions
+        function formatNumberWithCommas(value) {
+            if (value === null || value === undefined) return '';
+            const numStr = String(value).replace(/[^0-9]/g, '');
+            return Number(numStr).toLocaleString('ko-KR');
+        }
+
+        function formatCurrency(num) {
+            if (num === Infinity || isNaN(num)) return '무한';
+            if (num >= 100000000) {
+                return (num / 100000000).toLocaleString('ko-KR', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                }) + '억원';
+            } else if (num >= 10000) {
+                return (num / 10000).toLocaleString('ko-KR', { 
+                    maximumFractionDigits: 0 
+                }) + '만원';
+            }
+            return num.toLocaleString('ko-KR') + '원';
+        }
+
+        // Retirement Calculation
+        function retirementCalc(PV, monthly_spending, R, I, age, life_expectancy) {
+            const PMT = monthly_spending * 12;
+            const results = {};
+
+            let n;
+            if (Math.abs(R - I) < 1e-12) {
+                n = PMT > 0 ? (PV * (1 + R)) / PMT : Infinity;
+            } else if (PMT <= PV * (R - I)) {
+                n = Infinity;
+            } else {
+                if ((PV * (R - I)) / PMT >= 1) {
+                    n = Infinity;
+                } else {
+                    n = Math.log(1 - (PV * (R - I)) / PMT) / Math.log((1 + I) / (1 + R));
+                }
+            }
+            results.depletion_period = n;
+
+            const years = (n !== Infinity && !isNaN(n)) ? Math.ceil(n) + 2 : 50;
+            const records = [];
+            let asset = PV;
+            for (let t = 1; t < years; t++) {
+                const income = asset * R;
+                const spending = PMT * ((1 + I) ** (t - 1));
+                const asset_after_year = asset + income - spending;
+                records.push({
+                    Year: t,
+                    Start_Asset: asset,
+                    Income: income,
+                    Spending: spending,
+                    End_Asset: asset_after_year
+                });
+                asset = asset_after_year;
+                if (asset <= 0) {
+                    break;
+                }
+            }
+
+            if (age !== null && life_expectancy !== null && age < life_expectancy) {
+                const N = life_expectancy - age;
+                let PV_min;
+                if (Math.abs(R - I) < 1e-12) {
+                    PV_min = (PMT * N) / (1 + R);
+                } else {
+                    PV_min = PMT / (R - I) * (1 - ((1 + I) / (1 + R)) ** N);
+                }
+                results.min_required_funds = PV_min;
+            } else {
+                results.min_required_funds = 0;
+            }
+
+            return { results, df: records };
+        }
+
+        // Canvas Chart Implementation
+        function drawChart(data) {
+            const ctx = chartCanvas.getContext('2d');
+            const rect = chartCanvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Set canvas size
+            chartCanvas.width = rect.width * dpr;
+            chartCanvas.height = rect.height * dpr;
+            chartCanvas.style.width = rect.width + 'px';
+            chartCanvas.style.height = rect.height + 'px';
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+            const padding = window.innerWidth < 768 ? 40 : 60;
+
+            chartDimensions = { width, height, padding };
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            if (!data || data.length === 0) return;
+
+            // Prepare data
+            const values = data.map(d => d.End_Asset);
+            const minValue = Math.min(...values, 0);
+            const maxValue = Math.max(...values);
+            const range = maxValue - minValue;
+
+            // Drawing dimensions
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+
+            // Helper functions
+            const getX = (index) => padding + (index / (data.length - 1)) * chartWidth;
+            const getY = (value) => padding + chartHeight - ((value - minValue) / range) * chartHeight;
+
+            // Draw grid lines
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (i / 5) * chartHeight;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+
+            // Vertical grid lines
+            for (let i = 0; i <= 4; i++) {
+                const x = padding + (i / 4) * chartWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+            }
+
+            // Draw axes
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Draw y-axis labels
+            ctx.fillStyle = '#64748b';
+            ctx.font = window.innerWidth < 768 ? '10px sans-serif' : '12px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+
+            for (let i = 0; i <= 5; i++) {
+                const value = minValue + (range * i / 5);
+                const y = padding + chartHeight - (i / 5) * chartHeight;
+                const label = window.innerWidth < 768 ? 
+                    formatCurrency(value).replace('억원', '억').replace('만원', '만') : 
+                    formatCurrency(value);
+                ctx.fillText(label, padding - 10, y);
+            }
+
+            // Draw x-axis labels
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            const labelStep = Math.max(1, Math.floor(data.length / (window.innerWidth < 768 ? 5 : 10)));
+            for (let i = 0; i < data.length; i += labelStep) {
+                const x = getX(i);
+                const label = window.innerWidth < 768 ? `${data[i].Year}` : `${data[i].Year}년`;
+                ctx.fillText(label, x, height - padding + 10);
+            }
+
+            // Draw data line
+            ctx.strokeStyle = '#2589F4';
+            ctx.lineWidth = window.innerWidth < 768 ? 2 : 3;
+            ctx.beginPath();
+
+            for (let i = 0; i < data.length; i++) {
+                const x = getX(i);
+                const y = getY(values[i]);
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+
+            // Draw data points
+            ctx.fillStyle = '#2589F4';
+            const pointSize = window.innerWidth < 768 ? 3 : 4;
+            for (let i = 0; i < data.length; i++) {
+                const x = getX(i);
+                const y = getY(values[i]);
+
+                ctx.beginPath();
+                ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Fill area under curve
+            ctx.fillStyle = 'rgba(37, 137, 244, 0.1)';
+            ctx.beginPath();
+            ctx.moveTo(getX(0), height - padding);
+            for (let i = 0; i < data.length; i++) {
+                ctx.lineTo(getX(i), getY(values[i]));
+            }
+            ctx.lineTo(getX(data.length - 1), height - padding);
+            ctx.closePath();
+            ctx.fill();
+
+            chartData = data;
+        }
+
+        // Chart interaction
+        function handleChartMouseMove(event) {
+            const rect = chartCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            if (!chartData.length) return;
+
+            const { width, height, padding } = chartDimensions;
+            const chartWidth = width - padding * 2;
+
+            if (x >= padding && x <= width - padding && y >= padding && y <= height - padding) {
+                const dataIndex = Math.round(((x - padding) / chartWidth) * (chartData.length - 1));
+                if (dataIndex >= 0 && dataIndex < chartData.length) {
+                    const data = chartData[dataIndex];
+                    const tooltipContent = `
+                        <strong>${data.Year}년차</strong><br>
+                        연말 자산: ${Math.round(data.End_Asset).toLocaleString('ko-KR')}원
+                    `;
+
+                    tooltip.innerHTML = tooltipContent;
+                    tooltip.style.left = Math.min(event.clientX + 10, window.innerWidth - 220) + 'px';
+                    tooltip.style.top = Math.max(event.clientY - 60, 10) + 'px';
+                    tooltip.classList.add('show');
+                } else {
+                    tooltip.classList.remove('show');
+                }
+            } else {
+                tooltip.classList.remove('show');
+            }
+        }
+
+        function handleChartMouseLeave() {
+            tooltip.classList.remove('show');
+        }
+
+        // Touch events for mobile
+        function handleChartTouchMove(event) {
+            event.preventDefault();
+            const touch = event.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            handleChartMouseMove(mouseEvent);
+        }
+
+        function handleChartTouchEnd() {
+            tooltip.classList.remove('show');
+        }
+
+        // Dashboard Update
+        function updateDashboard() {
+            const PV = parseFloat(pvInput.value.replace(/,/g, '')) || 0;
+            const monthly_spending = parseFloat(monthlySpendingInput.value.replace(/,/g, '')) || 0;
+            const R = parseFloat(returnRateInput.value) / 100;
+            const I = parseFloat(inflationRateInput.value) / 100;
+            const age = parseInt(ageInput.value) || 0;
+            const life_expectancy = parseInt(lifeExpectancyInput.value) || 0;
+
+            returnRateValueSpan.textContent = `${(R * 100).toFixed(1)}%`;
+            inflationRateValueSpan.textContent = `${(I * 100).toFixed(1)}%`;
+
+            const calcResult = retirementCalc(PV, monthly_spending, R, I, age, life_expectancy);
+            currentResults = calcResult; // Store results for goal calculator
+
+            const { results, df } = calcResult;
+
+            // Update depletion period
+            if (results.depletion_period === Infinity || isNaN(results.depletion_period) || results.depletion_period > 999) {
+                depletionPeriodEl.textContent = '무한';
+            } else {
+                depletionPeriodEl.textContent = `${results.depletion_period.toFixed(1)}년`;
+            }
+
+            // Update minimum required funds
+            minRequiredFundsEl.textContent = formatCurrency(results.min_required_funds);
+
+            const difference = PV - results.min_required_funds;
+            if (difference >= 0) {
+                fundsComparisonEl.textContent = `현재 자산이 ${formatCurrency(difference)} 더 많아 안정적입니다.`;
+                fundsComparisonEl.className = 'comparison-text safe';
+            } else {
+                fundsComparisonEl.textContent = `${formatCurrency(Math.abs(difference))}이(가) 더 필요합니다.`;
+                fundsComparisonEl.className = 'comparison-text warning';
+            }
+
+            // Update table
+            tableBodyEl.innerHTML = '';
+            df.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.Year}</td>
+                    <td>${Math.round(row.Start_Asset).toLocaleString('ko-KR')}</td>
+                    <td>${Math.round(row.Income).toLocaleString('ko-KR')}</td>
+                    <td>${Math.round(row.Spending).toLocaleString('ko-KR')}</td>
+                    <td>${Math.round(row.End_Asset).toLocaleString('ko-KR')}</td>
+                `;
+                tableBodyEl.appendChild(tr);
+            });
+
+            // Update chart
+            drawChart(df);
+
+            // Update unit displays
+            updateInputUnit('pv');
+            updateInputUnit('monthly_spending');
+        }
+
+        // Input formatting
+        function setupInputFormatting() {
+            [pvInput, monthlySpendingInput, goalAmountInput].forEach(input => {
+                input.addEventListener('focus', (e) => {
+                    e.target.value = e.target.value.replace(/,/g, '');
+                });
+
+                input.addEventListener('blur', (e) => {
+                    e.target.value = formatNumberWithCommas(e.target.value);
+                });
+
+                input.addEventListener('input', (e) => {
+                    updateInputUnit(e.target.id);
+                });
+            });
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            document.getElementById('retirementForm').addEventListener('input', updateDashboard);
+            chartCanvas.addEventListener('mousemove', handleChartMouseMove);
+            chartCanvas.addEventListener('mouseleave', handleChartMouseLeave);
+
+            // Touch events for mobile
+            chartCanvas.addEventListener('touchmove', handleChartTouchMove);
+            chartCanvas.addEventListener('touchend', handleChartTouchEnd);
+
+            window.addEventListener('resize', () => {
+                setTimeout(updateDashboard, 100);
+            });
+        }
+
+        // Initialize
+        function initialize() {
+            pvInput.value = formatNumberWithCommas(pvInput.value);
+            monthlySpendingInput.value = formatNumberWithCommas(monthlySpendingInput.value);
+            setupInputFormatting();
+            setupEventListeners();
+            updateDashboard();
+
+            // Initialize unit displays
+            updateInputUnit('pv');
+            updateInputUnit('monthly_spending');
+        }
+
+        // Run when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+    </script>
+</body>
+</html>
